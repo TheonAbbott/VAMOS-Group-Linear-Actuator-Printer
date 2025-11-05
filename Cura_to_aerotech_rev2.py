@@ -1,3 +1,4 @@
+
 import numpy as np
 
 input_path = input("input the input cura file name: ")
@@ -17,6 +18,10 @@ modified_lines.append("G90")
 modified_lines.append("G1 F900")
 modified_lines.append("G0 X223.648 Y158.222 Z0.872")
 
+x1 = 0
+y1 = 0
+x = y = 0 
+
 for line in lines:
     stripped = line.strip()
 
@@ -24,19 +29,22 @@ for line in lines:
         parts = stripped.split()  # makes list of parts i.e. ['G1', 'X1', 'Y1', 'E0.5']
 
         # Initialize variables 
-        x = y = e = u = f = 0
+        e = u = f = 0
 
         for part in parts:
 
             if part.startswith("F"):
                 f = float(part[1:])
             elif part.startswith("X"):
+                x1 = x - float(part[1:])
                 x = float(part[1:])
             elif part.startswith("Y"):
+                y1 = y - float(part[1:])
                 y = float(part[1:])
             elif part.startswith("E"):
                 e = float(part[1:])
-                u = np.sqrt((x)**2 + (y)**2) * diameter_nozzle / diameter_syringe
+                u = np.sqrt((x1)**2 + (y1)**2) * diameter_nozzle / diameter_syringe
+        
         modified_lines.append("G1 X"+str(x)+" Y"+str(y)+" U"+str(u))
         
         
@@ -45,19 +53,22 @@ for line in lines:
         parts = stripped.split()  # makes list of parts i.e. ['G1', 'X1', 'Y1', 'E0.5']
 
         # Initialize variables 
-        x = y = e = u = f = 0
+        e = u = f = 0
 
         for part in parts:
 
             if part.startswith("F"):
                 f = float(part[1:])
             elif part.startswith("X"):
+                x1 = x - float(part[1:])
                 x = float(part[1:])
             elif part.startswith("Y"):
+                y1 = y - float(part[1:])
                 y = float(part[1:])
             elif part.startswith("E"):
                 e = float(part[1:])
-                u = np.sqrt((x)**2 + (y)**2) * diameter_nozzle / diameter_syringe
+                u = np.sqrt((x1)**2 + (y1)**2) * diameter_nozzle / diameter_syringe
+
         modified_lines.append("G0 X"+str(x)+" Y"+str(y)+" U"+str(u))
 
 # Write the list to a .gcode file
