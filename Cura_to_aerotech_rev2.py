@@ -1,4 +1,3 @@
-
 import numpy as np
 
 input_path = input("input the input cura file name: ")
@@ -15,12 +14,13 @@ with open(input_path, 'r') as infile:
 modified_lines = []
 
 modified_lines.append("G90")
-modified_lines.append("G1 F900")
+modified_lines.append("G1 F300")
 modified_lines.append("G0 X223.648 Y158.222 Z0.872")
 
-x1 = 0
-y1 = 0
-x = y = 0 
+x = 223.648
+y = 158.222
+z = 0.872
+x1 = y1 = e = u = f = 0
 
 for line in lines:
     stripped = line.strip()
@@ -28,8 +28,6 @@ for line in lines:
     if stripped.startswith("G1"):
         parts = stripped.split()  # makes list of parts i.e. ['G1', 'X1', 'Y1', 'E0.5']
 
-        # Initialize variables 
-        e = u = f = 0
 
         for part in parts:
 
@@ -41,19 +39,19 @@ for line in lines:
             elif part.startswith("Y"):
                 y1 = y - float(part[1:])
                 y = float(part[1:])
+            elif part.startswith("Z"):
+                z = float(part[1:])
             elif part.startswith("E"):
                 e = float(part[1:])
-                u = np.sqrt((x1)**2 + (y1)**2) * diameter_nozzle / diameter_syringe
+                u += np.sqrt((x1)**2 + (y1)**2) * ( (diameter_nozzle**2) / (diameter_syringe**2) ) 
         
-        modified_lines.append("G1 X"+str(x)+" Y"+str(y)+" U"+str(u))
+        modified_lines.append("G1 X"+str(x)+" Y"+str(y)+" Z"+str(z)+" U"+str(u))
         
         
   
     elif stripped.startswith("G0"):
         parts = stripped.split()  # makes list of parts i.e. ['G1', 'X1', 'Y1', 'E0.5']
 
-        # Initialize variables 
-        e = u = f = 0
 
         for part in parts:
 
@@ -65,15 +63,20 @@ for line in lines:
             elif part.startswith("Y"):
                 y1 = y - float(part[1:])
                 y = float(part[1:])
+            elif part.startswith("Z"):
+                z = float(part[1:])
             elif part.startswith("E"):
                 e = float(part[1:])
-                u = np.sqrt((x1)**2 + (y1)**2) * diameter_nozzle / diameter_syringe
+                u += np.sqrt((x1)**2 + (y1)**2) * ( (diameter_nozzle**2) / (diameter_syringe**2) ) 
 
-        modified_lines.append("G0 X"+str(x)+" Y"+str(y)+" U"+str(u))
+        modified_lines.append("G0 X"+str(x)+" Y"+str(y)+" Z"+str(z)+" U"+str(u))
 
 # Write the list to a .gcode file
 with open(output_path, "w") as file:
     for line in modified_lines:
         file.write(line + "\n")
+
+
+
 
 
